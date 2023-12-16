@@ -1,0 +1,749 @@
+{% load static %}
+{% load split_filter %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="icon"
+      type="image/x-icon"
+      href="{% static 'img/favicon.ico' %}"
+    />
+    <!-- Material Icons -->
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+    <title>Hasthi</title>
+    <style>
+      body {
+        height: 110%;
+        padding-bottom: 50px;
+      }
+      .date-range {
+        margin-top: 20px;
+        display: flex;
+        gap: 20px;
+      }
+      input[type="checkbox"] {
+        width: 20px;
+      }
+      .hidden {
+        opacity: 0;
+        pointer-events: none;
+      }
+      .table-container {
+        max-width: 100vw;
+        max-height: 500px;
+        overflow: scroll;
+      }
+      @media screen and (max-width: 1000px) {
+        .table-container {
+          max-width: 90vw;
+        }
+      }
+      .buttons {
+        display: flex;
+        gap: 10px;
+      }
+      @media screen and (max-width: 1000px) {
+        .buttons {
+          flex-direction: column;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    {% include 'admin_fullnav.html' %}
+    <div class="container-fluid">
+      <h3>Filter Requests</h3>
+      {% csrf_token %}
+      <div class="row mt-5">
+        <div class="col-lg-3">
+          <label for=""
+            >Filter By Date
+            <input type="checkbox" name="Filter_Type" id="date_filter" /></label
+          ><br />
+          <select
+            class="form-control hidden"
+            name="Date_Filter_Value"
+            id="date_filter_value"
+          >
+            <option value="">-- Select date range --</option>
+            <option value="today">Today</option>
+            <option value="tomorrow">Tomorrow</option>
+            <option value="yesterday">Yesterday</option>
+            <option value="week">This week</option>
+            <option value="month">Last month</option>
+            <option value="custom">Custom Date</option>
+            <option value="range">Range of Dates</option>
+          </select>
+          <div class="date-range">
+            <input
+              type="date"
+              class="form-control hidden"
+              name="Date-1"
+              id="date-1"
+            />
+            <strong class="hidden" id="to_label"> To </strong>
+            <input
+              type="date"
+              class="form-control hidden"
+              name="Date-2"
+              id="date-2"
+            />
+          </div>
+        </div>
+        <div class="col-lg-5">
+          <label for=""
+            >Filter By Location
+            <input
+              type="checkbox"
+              name="Filter_Type"
+              id="location_filter" /></label
+          ><br />
+          <select
+            class="form-control hidden"
+            name="Location_Filter_Value"
+            id="location_filter_value"
+            style="width: 50%"
+          >
+            <option value="">-- Select Location Type --</option>
+            <option value="Departure">Departure</option>
+            <option value="Destination">Destination</option>
+            <option value="Both">Departure and Destination</option>
+          </select>
+          <div class="date-range">
+            <select
+              class="form-control hidden"
+              name="Departure_Location"
+              id="departure_location"
+            >
+              <option value="">-- Select Departure Location --</option>
+              {% for location in Locations %}
+              <option value="{{location.Name}}">{{location.Name}}</option>
+              {% endfor %}
+            </select>
+            <strong class="hidden" id="to_label_loc">To</strong>
+            <select
+              class="form-control hidden"
+              name="Destination_Location"
+              id="destination_location"
+            >
+              <option value="">-- Select Destination Location --</option>
+              {% for location in Locations %}
+              <option value="{{location.Name}}">{{location.Name}}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+        <div class="col-lg-3">
+          <label for=""
+            >Filter By Bus Number
+            <input type="checkbox" name="Filter_Type" id="bus_filter"
+          /></label>
+          <select
+            class="form-control hidden"
+            name="Bus_Filter_Value"
+            id="bus_filter_value"
+          >
+            <option value="">-- Select Bus No --</option>
+            {% for driver in Drivers %}
+            <option value="{{driver.Bus_No}}">
+              {{driver.Bus_No}} ({{driver.Full_Name}})
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-lg-3">
+          <label for=""
+            >Filter By Journey Status
+            <input type="checkbox" name="Filter_Type" id="journey_filter"
+          /></label>
+          <select
+            class="form-control hidden"
+            name="Journey_Filter_Value"
+            id="journey_filter_value"
+          >
+            <option value="">-- Select Journey Status --</option>
+            <option value="Ongoing">Ongoing</option>
+            <option value="Cancelled">Cancelled</option>
+            <option value="Rejected">Rejected</option>
+            <option value="Completed">Completed</option>
+          </select>
+        </div>
+        <div class="col-lg-3">
+          <label for=""
+            >Filter By Payment Status
+            <input type="checkbox" name="Filter_Type" id="payment_filter"
+          /></label>
+          <select
+            class="form-control hidden"
+            name="Payment_Filter_Value"
+            id="payment_filter_value"
+          >
+            <option value="">-- Select Payment Status --</option>
+            <option value="Paid">Paid</option>
+            <option value="Not_Paid">Not Paid</option>
+            <option value="To_Be_Refunded">To Be Refuned</option>
+            <option value="Refunded">Refunded</option>
+          </select>
+        </div>
+      </div>
+      <div class="row mt-3">
+        <div class="col-md-12 text-center mb-5">
+          <input type="hidden" name="" id="refresh" value="0" />
+          <button
+            class="btn btn-primary"
+            name="Apply"
+            id="apply"
+            value=" "
+            onclick="getData();document.getElementById('refresh').value ='1'"
+          >
+            Apply Filters
+          </button>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table class="table table-striped">
+          <thead class="bg-secondary">
+            <th>S No.</th>
+            <th>Request Approval</th>
+            <th>Booking Id</th>
+            <th>Username</th>
+            <th>Full Name</th>
+            <th>Departure</th>
+            <th>Destination</th>
+            <th>Date</th>
+            <th>Time</th>
+            <th>No. Of Persons</th>
+            <th>Alloted Persons</th>
+            <th>Journey Status</th>
+            <th>Payment Status</th>
+            <th>Bus No. / Driver</th>
+          </thead>
+          <tbody id="request_list">
+            {% if Today_Requests %} {% for request in Today_Requests %}
+            <tr>
+              <td>{{forloop.counter}}</td>
+              {% if request.Journey_Status == "Ongoing" and request.Admin_Accept_Status == 0 %}
+              <td class="{{request.Order_Id}}-approval_status">
+                <div class="buttons">
+                  <button
+                    class="btn btn-success"
+                    id="{{request.Order_Id}}-accept"
+                    onclick="Approval(this);"
+                  >
+                    Accept
+                  </button>
+                  <button
+                    class="btn btn-danger"
+                    id="{{request.Order_Id}}-reject"
+                    onclick="Approval(this);"
+                  >
+                    Reject
+                  </button>
+                </div>
+                <span id="{{request.Order_Id}}-message"></span>
+              </td>
+              {% elif request.Journey_Status == "Ongoing" and request.Admin_Accept_Status == 1 and request.Pay_Status == 1 and request.No_Of_Persons != request.Allocated_Persons %}
+              <td class="{{request.Order_Id}}-approval_status">
+                Allocate to a Bus <br />
+                {% with request.No_Of_Persons|sub:request.Allocated_Persons as unallocated %}
+                <input type="number" min="1" max="{{unallocated}}" class="form-control" id="{{request.Order_Id}}-no_of_persons_to_allocate" oninput="valid_max(this)" value="1">
+                {% endwith %}
+                <select
+                  class="form-control Bus_No"
+                  name=""
+                  id="{{request.Order_Id}}-bus_no"
+                >
+                  <option value="">-- Select Bus --</option>
+                  {% for driver in Drivers %}
+                  {% if driver.Available_Seats != 0 %}
+                  <option value="{{driver.Bus_No}}">{{driver.Bus_No}} - {{driver.Available_Seats}} ({{driver.Full_Name}})</option>
+                  {% endif %}
+                  {% endfor %}
+                </select>
+                <button
+                  class="btn btn-primary"
+                  id="{{request.Order_Id}}-allocate_bus"
+                  onclick="Allocate_Bus(this)"
+                >
+                  Allocate Bus
+                </button>
+              </td>
+              {% elif request.Journey_Status == "Ongoing" and request.Admin_Accept_Status == 1 and request.Pay_Status == 0 %}
+              <td class="{{request.Order_Id}}-approval_status">
+                Waiting for Payment
+              </td>
+              {% else %}
+              <td class="{{request.Order_Id}}-approval_status">
+                No Need for Approval
+              </td>
+              {% endif %}
+              <td>{{request.Order_Id}}</td>
+              <td>{{request.Username}}</td>
+              <td>{{request.Full_Name}}</td>
+              <td>{{request.Departure}}</td>
+              <td>{{request.Destination}}</td>
+              <td>{{request.Date}}</td>
+              <td>{{request.Time}}</td>
+              <td>{{request.No_Of_Persons}}</td>
+              <td id="{{request.Order_Id}}-allocated_persons">{{request.Allocated_Persons}}</td>
+              <td id="{{request.Order_Id}}-journey_status">
+                {{request.Journey_Status}}
+              </td>
+              {% if request.Pay_Status == 1 %}
+              <td>Paid</td>
+              {% else %}
+              <td>Not Paid</td>
+              {% endif %} 
+              {% if request.Bus_No != None %}
+              {% with request.Bus_No|split:"," as buses %}
+              {% for bus in buses %}
+              {% with bus|split:"-" as bus_details %}
+              <td id="{{request.Order_Id}}-allocated_bus_no">
+              {% for bus_no,driver_name in Driver_Names.items %}
+                {% if bus_no == bus_details.1 %}
+                {{bus_details.0}} person(s) - {{bus_no}} ({{driver_name}}) <br>
+                {% endif %}
+              {% endfor %}
+              </td>
+              {% endwith %}
+              {% endfor %}
+              {% endwith %}
+              {% else %}
+              <td id="{{request.Order_Id}}-allocated_bus_no">N/A</td>
+              {% endif %}
+            </tr>
+            {% endfor %}
+            {% else %}
+            <tr>
+              <td colspan="14" class="text-center">No Requests for Today!!</td>
+            </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Scripts -->
+
+    <!-- Toggle Filters -->
+    <script type="text/javascript">
+      $("#date_filter").on("click", () => {
+        if ($("#date_filter").is(":checked")) {
+          $("#date_filter_value").removeClass("hidden");
+        } else {
+          $("#date_filter_value").val("");
+          $("#date-1").val("");
+          $("#date-2").val("");
+          $("#date_filter_value").addClass("hidden");
+          $("#date-1").addClass("hidden");
+          $("#date-2").addClass("hidden");
+          $("#to_label").addClass("hidden");
+        }
+      });
+      $("#location_filter").on("click", () => {
+        if ($("#location_filter").is(":checked")) {
+          $("#location_filter_value").removeClass("hidden");
+        } else {
+          $("#location_filter_value").val("");
+          $("#departure_location").val("");
+          $("#destination_location").val("");
+          $("#location_filter_value").addClass("hidden");
+          $("#departure_location").addClass("hidden");
+          $("#destination_location").addClass("hidden");
+          $("#to_label-loc").addClass("hidden");
+        }
+      });
+      $("#bus_filter").on("click", () => {
+        $("#bus_filter_value").toggleClass("hidden");
+        $("#bus_filter_value").val("");
+      });
+      $("#journey_filter").on("click", () => {
+        $("#journey_filter_value").toggleClass("hidden");
+        $("#journey_filter_value").val("");
+      });
+      $("#payment_filter").on("click", () => {
+        $("#payment_filter_value").toggleClass("hidden");
+        $("#payment_filter_value").val("");
+      });
+    </script>
+
+    <!-- Page Refresh -->
+    <script type="text/javascript">
+      window.onbeforeunload = function (e) {
+        e = e || window.event;
+        if ($("#refresh").val() == "1") {
+          return "Sure?";
+        }
+      };
+    </script>
+
+    <!-- Display Date Range and Location Type -->
+    <script type="text/javascript">
+      $("#date_filter_value").on("change", () => {
+        var filter = $("#date_filter_value").val();
+        if (filter == "custom") {
+          $("#date-1").removeClass("hidden");
+          $("#date-2").addClass("hidden");
+          $("#to_label").addClass("hidden");
+        } else if (filter == "range") {
+          $("#date-1").removeClass("hidden");
+          $("#date-2").removeClass("hidden");
+          $("#to_label").removeClass("hidden");
+        } else {
+          $("#date-1").addClass("hidden");
+          $("#date-2").addClass("hidden");
+          $("#to_label").addClass("hidden");
+        }
+      });
+      $("#location_filter_value").on("change", () => {
+        var filter = $("#location_filter_value").val();
+        if (filter == "Departure") {
+          $("#departure_location").removeClass("hidden");
+          $("#destination_location").addClass("hidden");
+          $("#to_label_loc").addClass("hidden");
+        } else if (filter == "Destination") {
+          $("#departure_location").addClass("hidden");
+          $("#destination_location").removeClass("hidden");
+          $("#to_label_loc").addClass("hidden");
+        } else if (filter == "Both") {
+          $("#departure_location").removeClass("hidden");
+          $("#destination_location").removeClass("hidden");
+          $("#to_label_loc").removeClass("hidden");
+        } else {
+          $("#departure_location").addClass("hidden");
+          $("#destination_location").addClass("hidden");
+          $("#to_label_loc").addClass("hidden");
+        }
+      });
+    </script>
+
+    <!-- Apply Filters -->
+    <script type="text/javascript">
+      function getStartOfWeek() {
+        const currentDate = new Date();
+        const dayOfWeek = currentDate.getDay(); // Sunday is 0, Monday is 1, and so on
+        const diff =
+          currentDate.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1); // Adjust when the week starts on Sunday
+
+        const startOfWeek = new Date(currentDate.setDate(diff));
+
+        const year = startOfWeek.getFullYear();
+        const month = String(startOfWeek.getMonth() + 1).padStart(2, "0"); // Months are 0-based
+        const day = String(startOfWeek.getDate()).padStart(2, "0");
+
+        const formattedStartDate = `${day}-${month}-${year}`;
+        return formattedStartDate;
+      }
+      function getData() {
+        let data = { Filters: [] };
+        var filters = document.querySelectorAll('[name = "Filter_Type"]');
+        filters.forEach((filter) => {
+          if (filter.checked) {
+            if (filter.id == "date_filter") {
+              date = new Date();
+              const date_filter_value =
+                document.getElementById("date_filter_value").value;
+              if (date_filter_value != "") {
+                if (date_filter_value == "custom") {
+                  const date = $("#date-1").val();
+                  if (date != "") {
+                    data["Filters"].push({
+                      Name: "date",
+                      Type: "custom",
+                      Value: [$("#date-1").val()],
+                    });
+                  }
+                } else if (date_filter_value == "range") {
+                  const startDate = $("#date-1").val();
+                  const endDate = $("#date-2").val();
+                  if (startDate != "" && endDate != "") {
+                    data["Filters"].push({
+                      Name: "date",
+                      Type: "range",
+                      Value: [startDate, endDate],
+                    });
+                  }
+                } else {
+                  switch (date_filter_value) {
+                    case "today":
+                      today =
+                        date.getDate() +
+                        "-" +
+                        (date.getMonth() + 1) +
+                        "-" +
+                        date.getFullYear();
+                      data["Filters"].push({
+                        Name: "date",
+                        Type: "today",
+                        Value: [today],
+                      });
+                      break;
+                    case "tomorrow":
+                      tomorrow =
+                        date.getDate() + 1 +
+                        "-" +
+                        (date.getMonth() + 1) +
+                        "-" +
+                        date.getFullYear();
+                      data["Filters"].push({
+                        Name: "date",
+                        Type: "tomorrow",
+                        Value: [tomorrow],
+                      });
+                      break;
+                    case "yesterday":
+                      yesterday =
+                        date.getDate() -
+                        1 +
+                        "-" +
+                        (date.getMonth() + 1) +
+                        "-" +
+                        date.getFullYear();
+                      data["Filters"].push({
+                        Name: "date",
+                        Type: "yesterday",
+                        Value: [yesterday],
+                      });
+                      break;
+                    case "week":
+                      weekStartDay = getStartOfWeek();
+                      today =
+                        date.getDate() +
+                        "-" +
+                        (date.getMonth() + 1) +
+                        "-" +
+                        date.getFullYear();
+                      data["Filters"].push({
+                        Name: "date",
+                        Type: "week",
+                        Value: [weekStartDay, today],
+                      });
+                      break;
+                    case "month":
+                      last_month = new Date().getMonth();
+                      year = new Date().getFullYear();
+                      if (last_month == 0) {
+                        year = new Date().getFullYear() - 1;
+                      }
+                      last_date = new Date(year, last_month, 0).getDate();
+                      data["Filters"].push({
+                        Name: "date",
+                        Type: "month",
+                        Value: [last_month, year, last_date],
+                      });
+                      break;
+                  }
+                }
+              }
+            } else if (filter.id == "location_filter") {
+              var location_filter_value = document.getElementById(
+                "location_filter_value"
+              ).value;
+              if (location_filter_value != "") {
+                if (location_filter_value == "Departure") {
+                  const departure_location =
+                    document.getElementById("departure_location").value;
+                  if (departure_location != "") {
+                    data["Filters"].push({
+                      Name: "location",
+                      Type: "Departure",
+                      Value: [departure_location],
+                    });
+                  }
+                } else if (location_filter_value == "Destination") {
+                  const destination_location = document.getElementById(
+                    "destination_location"
+                  ).value;
+                  if (destination_location != "") {
+                    data["Filters"].push({
+                      Name: "location",
+                      Type: "Destination",
+                      Value: [destination_location],
+                    });
+                  }
+                } else if (location_filter_value == "Both") {
+                  const departure_location =
+                    document.getElementById("departure_location").value;
+                  const destination_location = document.getElementById(
+                    "destination_location"
+                  ).value;
+                  if (departure_location != "" && destination_location != "") {
+                    data["Filters"].push({
+                      Name: "location",
+                      Type: "Both",
+                      Value: [departure_location, destination_location],
+                    });
+                  }
+                }
+              }
+            } else if (filter.id == "bus_filter") {
+              var bus_filter_value =
+                document.getElementById("bus_filter_value").value;
+              if (bus_filter_value != "") {
+                data["Filters"].push({
+                  Name: "bus",
+                  Type: "Bus",
+                  Value: [bus_filter_value],
+                });
+              }
+            } else if (filter.id == "journey_filter") {
+              var journey_filter_value = document.getElementById(
+                "journey_filter_value"
+              ).value;
+              if (journey_filter_value != "") {
+                data["Filters"].push({
+                  Name: "journey",
+                  Type: "journey",
+                  Value: [journey_filter_value],
+                });
+              }
+            } else if (filter.id == "payment_filter") {
+              var payment_filter_value = document.getElementById(
+                "payment_filter_value"
+              ).value;
+              if(payment_filter_value == "Paid"){
+                payment_filter_value = 1
+              } else if(payment_filter_value == "Not_Paid"){
+                payment_filter_value = 0
+              }
+              if (payment_filter_value != "" || payment_filter_value == 0) {
+                data["Filters"].push({
+                  Name: "payment",
+                  Type: "payment",
+                  Value: [payment_filter_value],
+                });
+              }
+            }
+          }
+        });
+        if (data["Filters"].length == 0) {
+          location.reload();
+        } else {
+          $.ajax({
+            url: "",
+            type: "POST",
+            data: {
+              Action: "Filter",
+              Data: JSON.stringify(data),
+              csrfmiddlewaretoken: $('[name="csrfmiddlewaretoken"]').val(),
+            },
+            success: function (data) {
+              if (data == "No Data Found") {
+                $("#request_list")
+                  .empty()
+                  .append(
+                    '<tr><td colspan="14" class="text-center">No Data Found For These Filters!!</td></tr>'
+                  );
+              } else {
+                $("#request_list").empty().append(data);
+              }
+            },
+          });
+        }
+      }
+    </script>
+
+    <!-- Request Approval and Allocate Bus -->
+    <script type="text/javascript">
+      function Approval(ele) {
+        let order_id = ele.id.split("-")[0];
+        let action = ele.id.split("-")[1];
+        $.ajax({
+          url: "",
+          type: "post",
+          data: {
+            Action: "Approval",
+            Order_Id: order_id,
+            Status: action,
+            csrfmiddlewaretoken: $('[name="csrfmiddlewaretoken"]').val(),
+          },
+          success: function (data) {
+            if (data == "true") {
+              document.querySelector(
+                "." + order_id + "-approval_status"
+              ).innerHTML = "Waiting for Payment";
+            } else if (data == "false") {
+              document.querySelector(
+                "." + order_id + "-approval_status"
+              ).innerHTML = "No Need for Approval";
+              document.getElementById(order_id + "-journey_status").innerHTML =
+                "Rejected";
+            }
+          },
+        });
+      }
+
+      function Allocate_Bus(ele) {
+        let order_id = ele.id.split("-")[0];
+        let bus_no = document.getElementById(order_id + "-bus_no").value;
+        let no_of_persons_to_allocate = document.getElementById(order_id + "-no_of_persons_to_allocate").value;
+        if (bus_no != "") {
+          $.ajax({
+            url: "",
+            type: "post",
+            data: {
+              Action: "Allocate",
+              Order_Id: order_id,
+              Bus_No: bus_no,
+              No_Of_Persons_To_Allocate:no_of_persons_to_allocate,
+              csrfmiddlewaretoken: $('[name="csrfmiddlewaretoken"]').val(),
+            },
+            success: function (data) {
+              status = data.split(",")[0];
+              if (status == "true") {
+                bus_details = data.split(",")[1];
+                allocated = data.split(",")[2];
+                document.querySelector(
+                  "." + order_id + "-approval_status"
+                ).innerHTML = "No Need for Approval";
+                document.getElementById(
+                  order_id + "-allocated_bus_no"
+                ).innerHTML = bus_details;
+                document.getElementById(
+                  order_id + "-allocated_persons"
+                ).innerHTML = allocated;
+              } else if (status == "false") {
+                bus_details = data.split(",")[1];
+                allocated = data.split(",")[2];
+                unallocated = data.split(",")[3];
+                document.getElementById(
+                  order_id + "-allocated_persons"
+                ).innerHTML = allocated;
+                document.getElementById(
+                  order_id + "-no_of_persons_to_allocate"
+                ).value = 1;
+                document.getElementById(
+                  order_id + "-no_of_persons_to_allocate"
+                ).setAttribute('max',parseInt(unallocated));
+                document.getElementById(
+                  order_id + "-allocated_bus_no"
+                ).innerHTML = bus_details;
+              } 
+            },
+          });
+        }
+      }
+    </script>
+
+    <!-- Check Max Persons To be Allocated -->
+    <script type="text/javascript">
+      function valid_max(ele){
+        if(parseInt(ele.value) > parseInt(ele.max)){
+          ele.style.outline = "2px solid red";
+        } else{
+          ele.style.outline = "none";
+        }
+      }
+    </script>
+  </body>
+</html>

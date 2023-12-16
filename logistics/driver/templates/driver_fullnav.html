@@ -1,0 +1,105 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <!-- mdBootstrap CDN -->
+    <!-- MDB -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.2/mdb.min.css"
+      rel="stylesheet"
+    />
+    <!-- Font Awesome Icons -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <!-- MDB -->
+    <script
+      type="text/javascript"
+      src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.2/mdb.min.js"
+    ></script>
+
+    <!-- Sidebar CSS -->
+    <link rel="stylesheet" href="{% static 'css/fullnav.css' %}" />
+
+    <title>Hasthi</title>
+  </head>
+  <style>
+    
+  </style>
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-dark navbar-expand-lg">
+        <!-- Container wrapper -->
+        <div class="container-fluid">
+          <a class="navbar-brand mt-2 mt-lg-0" href="/driver/">
+              <img
+                src="{% static 'img/Logo.png' %}"
+                height="50"
+                alt="Hasthi Logo"
+                loading="lazy"
+                title="Hasthi"
+              />
+              <h3>HASTHI</h3>
+            </a>
+            <!-- Avatar -->
+            <div class="dropdown">
+              <a
+                class="dropdown-toggle d-flex mx-lg-5 align-items-center hidden-arrow"
+                href="#"
+                id="navbarDropdownMenuAvatar"
+                role="button"
+                data-mdb-toggle="dropdown"
+                aria-expanded="false"
+              >
+                <img
+                  src="{% static 'img/avatar.png' %}"
+                  class="rounded-circle"
+                  height="50"
+                  alt="Driver Icon"
+                  loading="lazy"
+                />
+              </a>
+              <ul
+                class="dropdown-menu dropdown-menu-end"
+                aria-labelledby="navbarDropdownMenuAvatar"
+              >
+                <li>
+                  <a class="dropdown-item" href="/driver/profile/">My profile</a>
+                </li>
+                <li>
+                  <a class="dropdown-item" href="/driver/logout/">Logout</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+    </nav>
+    <input type="checkbox" id="check">
+    <label for="check" id="hamburger">
+      <i class="fas fa-bars" id="btn"></i>
+      <i class="fas fa-times" id="cancel"></i>
+    </label> 
+    <div class="sidebar">
+    <header><img src="{% static 'img/Logo.png' %}" alt="" width="90px"><!-- Hasthi --></header>
+    <ul id="sidebar-menu">
+     <li><a href="/driver/"><i class="fas fa-qrcode"></i>Dashboard</a></li>
+    </ul>
+   </div>
+   <!-- Scripts -->
+   <!-- Navbar Brand Animation -->
+   <script>
+    check = document.getElementById('check')
+    check.addEventListener('click',()=>{
+      if(check.checked){
+        $('.navbar-brand h3').css({'margin-left':'250%','transition':'all 0.5s ease'})
+      } else{
+        $('.navbar-brand h3').css('margin-left','10%')
+      }
+    })
+   </script>
+  </body>
+</html>

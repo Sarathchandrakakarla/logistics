@@ -1,0 +1,440 @@
+{% load static %}
+{% load split_filter %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="icon"
+      type="image/x-icon"
+      href="{% static 'img/favicon.ico' %}"
+    />
+    <!-- Material Icons -->
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+    <title>Hasthi</title>
+    <style>
+      body {
+        height: 110%;
+        padding-bottom: 50px;
+      }
+      #available,
+      #available span {
+        background-color: green;
+        color: white;
+      }
+      #on_trip,
+      #on_trip span {
+        background-color: yellow;
+        color: black;
+      }
+      #unavailable,
+      #unavailable span {
+        background-color: red;
+        color: white;
+      }
+      .table-container {
+        max-width: 100vw;
+        max-height: 500px;
+        overflow: scroll;
+      }
+      @media screen and (max-width: 900px) {
+        .table-container {
+          max-width: 90vw;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    {% include 'driver_fullnav.html' %}
+    <div class="container">
+      <form action="" method="post">
+        {% csrf_token %}
+        <div class="row justify-content-center">
+          <div class="col-lg-2">
+            <strong>Your Available Status </strong>
+          </div>
+          <div class="col-lg-3">
+            <select class="form-control" name="Status" id="status">
+              {% if Status == "Available" %}
+              <option value="Available" id="available" selected>
+                <span>&#x2713;</span> Available
+              </option>
+              {% else %}
+              <option value="Available" id="available">
+                <span>&#x2713;</span> Available
+              </option>
+              {% endif %} {% if Status == "On Trip" %}
+              <option value="On Trip" id="on_trip" selected>
+                <span>&#33;</span> On Trip
+              </option>
+              {% else %}
+              <option value="On Trip" id="on_trip">
+                <span>&#33;</span> On Trip
+              </option>
+              {% endif %} {% if Status == "Unavailable" %}
+              <option value="Unavailable" id="unavailable" selected>
+                <span>&#215;</span> Unavailable
+              </option>
+              {% else %}
+              <option value="Unavailable" id="unavailable">
+                <span>&#215;</span> Unavailable
+              </option>
+              {% endif %}
+            </select>
+          </div>
+          <div class="col-lg-3">
+            <button
+              class="btn btn-primary"
+              type="submit"
+              name="Set_Status"
+              id="set_status"
+              value=" "
+            >
+              <i class="fas fa-check" style="padding-right: 10px"></i>Set Status
+            </button>
+          </div>
+        </div>
+      </form>
+
+      <form action="" method="post">
+        {% csrf_token %}
+        <div class="row justify-content-center mt-3">
+          <div class="col-lg-2">
+            <strong>Your Bus No. </strong>
+          </div>
+          <div class="col-lg-3">
+            {% if Bus_No %}
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Enter Your Bus No"
+              name="Bus_No"
+              id="bus_no"
+              oninput="this.value = this.value.toUpperCase()"
+              value="{{Bus_No}}"
+            />
+            {% else %}
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Enter Your Bus No"
+              name="Bus_No"
+              id="bus_no"
+              oninput="this.value = this.value.toUpperCase()"
+            />
+            {% endif %}
+          </div>
+          <div class="col-lg-3">
+            <button
+              class="btn btn-primary"
+              type="submit"
+              name="Set_Bus_No"
+              id="set_bus_no"
+              value=" "
+            >
+              <i class="fas fa-check" style="padding-right: 10px"></i>
+              {% if Bus_No %} Change {% else %} Set {% endif %} Bus No
+            </button>
+          </div>
+        </div>
+      </form>
+      <form action="" method="post">
+        {% csrf_token %}
+        <div class="row justify-content-center mt-3">
+          <div class="col-lg-2">
+            <strong>Your Current Location </strong>
+          </div>
+          <div class="col-lg-3">
+            <select class="form-control" name="Current_Location" id="current_location">
+              {{Current_Location}}
+              <option value="">-- Select Location --</option>
+              {% for location in Locations %}
+              {% if Current_Location and Current_Location == location.Name %}
+              <option value="{{location.Name}}" selected>{{location.Name}}</option>
+              {% else %}
+              <option value="{{location.Name}}">{{location.Name}}</option>
+              {% endif %}
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-lg-3">
+            <button
+              class="btn btn-primary"
+              type="submit"
+              name="Update_Current_Location"
+              id="update_current_location"
+              value=" "
+            >
+              <i class="fas fa-check" style="padding-right: 10px"></i>
+              Update Current Location
+            </button>
+          </div>
+        </div>
+      </form>
+
+      <h2 class="mt-5">
+        Allocated Passengers on Today (<span id="date"></span>)
+      </h2>
+      <div class="table-container mt-5">
+        <table
+          class="table table-striped table-bordered"
+          style="border-color: black"
+        >
+          <thead class="bg-secondary text-white text-center">
+            <th>S No.</th>
+            <th>Booking Id</th>
+            <th>Passenger Name</th>
+            <th>Departure</th>
+            <th>Destination</th>
+            <th>Date of Journey</th>
+            <th>Time of Journey</th>
+            <th>No Of Persons</th>
+            <th>Journey Status</th>
+          </thead>
+          <tbody>
+            {% if not Passenger_List %}
+            <tr>
+              <td colspan="9" style="text-align: center">
+                No Passengers Alloted Today!
+              </td>
+            </tr>
+            {% else %} {% for passenger in Passenger_List %}
+            <tr>
+              <td>{{forloop.counter}}</td>
+              <td>{{passenger.Order_Id}}</td>
+              <td>{{passenger.Full_Name}}</td>
+              <td>{{passenger.Source}}</td>
+              <td>{{passenger.Destination}}</td>
+              <td>{{passenger.Date}}</td>
+              <td>{{passenger.Time}}</td>
+              <td>
+                {% for order_id,allocated_persons in Allocated_Persons.items %}
+                  {% if order_id == passenger.Order_Id %}
+                    {{ allocated_persons }}
+                  {% endif %}
+                {% endfor %}
+              </td>
+              {% with passenger.Verify_Status|split:"," as buses %}
+              {% with passenger.Completion_Status|split:"," as completed_buses %}
+                {% for bus in buses %}
+                {% for completed_bus in completed_buses %}
+                  {% with bus|split:"-" as bus_details %}
+                  {% with completed_bus|split:"-" as completed_bus_details %}
+                    {% if bus_details.0 == 'Not_Verified' and bus_details.1 == Bus_No and completed_bus_details.0 == 'Not_Completed' and completed_bus_details.1 == Bus_No %}
+                      <td>
+                        <div style="display: flex; gap: 10px">
+                          <input
+                            type="number"
+                            class="form-control"
+                            style="width: 100px"
+                            id="{{passenger.Order_Id}}-code"
+                            /><button
+                            class="btn btn-success"
+                            id="{{passenger.Order_Id}}-verify"
+                            onclick="verify(this)"
+                          >
+                            Verify
+                          </button>
+                        </div>
+                        <span
+                          id="{{passenger.Order_Id}}-error"
+                          style="color: red"
+                        ></span>
+                      </td>
+                    {% elif bus_details.0 == 'Verified' and bus_details.1 == Bus_No and completed_bus_details.0 == 'Not_Completed' and completed_bus_details.1 == Bus_No %}
+                      <td>
+                        Passenger Boarded <br />
+                        <button
+                          class="btn btn-warning"
+                          id="{{passenger.Order_Id}}-drop"
+                          onclick="if(confirm('Confirm to Drop the Passenger?')){drop(this)}"
+                        >
+                          Drop
+                        </button>
+                      </td>
+                    {% endif %}
+                  {% endwith %}
+                  {% endwith %}
+                {% endfor %}
+                {% endfor %}
+              {% endwith %}
+              {% endwith %}
+            </tr>
+            {% endfor %} {% endif %}
+          </tbody>
+        </table>
+      </div>
+
+      <h2 class="mt-5">
+        Journey Completed Passengers on Today (<span id="date"></span>)
+      </h2>
+      <div class="table-container mt-5">
+        <table
+          class="table table-striped table-bordered"
+          style="border-color: black"
+        >
+          <thead class="bg-secondary text-white text-center">
+            <th>S No.</th>
+            <th>Booking Id</th>
+            <th>Passenger Name</th>
+            <th>Departure</th>
+            <th>Destination</th>
+            <th>Date of Journey</th>
+            <th>Time of Journey</th>
+            <th>No Of Persons</th>
+          </thead>
+          <tbody>
+            {% if not Completed_List %}
+            <tr>
+              <td colspan="8" style="text-align: center">
+                No Passengers Completed Journeys Yet Today!
+              </td>
+            </tr>
+            {% else %} {% for passenger in Completed_List %}
+            <tr>
+              <td>{{forloop.counter}}</td>
+              <td>{{passenger.Order_Id}}</td>
+              <td>{{passenger.Full_Name}}</td>
+              <td>{{passenger.Source}}</td>
+              <td>{{passenger.Destination}}</td>
+              <td>{{passenger.Date}}</td>
+              <td>{{passenger.Time}}</td>
+              <td>
+                {% for order_id,allocated_persons in Allocated_Persons.items %}
+                  {% if order_id == passenger.Order_Id %}
+                    {{ allocated_persons }}
+                  {% endif %}
+                {% endfor %}
+              </td>
+            </tr>
+            {% endfor %} {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Scripts -->
+
+    <!-- Set Background Color of Status Select -->
+    <script type="text/javascript">
+      var select = $("#status");
+      var status = select.val();
+      function setBackground(status) {
+        switch (status) {
+          case "Available":
+            select.css({
+              "background-color": "green",
+              color: "white",
+              outline: "2px solid black",
+            });
+            break;
+          case "On Trip":
+            select.css({ "background-color": "yellow", color: "black" });
+            break;
+          case "Unavailable":
+            select.css({ "background-color": "red", color: "white" });
+            break;
+        }
+      }
+      setBackground(status);
+      select.on("change", () => {
+        status = $("#status").val();
+        setBackground(status);
+      });
+    </script>
+
+    <!-- Current Location Enable or Disable -->
+    <script type="text/javascript">
+      const current_location = document.getElementById("current_location");
+      const update_current_location = document.getElementById("update_current_location");
+      if ($("#status").val() == "Unavailable") {  
+        current_location.disabled = true;
+        update_current_location.disabled = true;
+      } else{
+        current_location.disabled = false;
+        update_current_location.disabled = false;
+      }
+    </script>
+
+    <!-- Display Today Date -->
+    <script type="text/javascript">
+      var date = document.querySelectorAll('#date');
+      var date_obj = new Date();
+      if (date_obj.getDate() < 10) {
+        var today =
+          "0" +
+          date_obj.getDate() +
+          "-" +
+          (date_obj.getMonth() + 1) +
+          "-" +
+          date_obj.getFullYear();
+      } else {
+        var today =
+          date_obj.getDate() +
+          "-" +
+          (date_obj.getMonth() + 1) +
+          "-" +
+          date_obj.getFullYear();
+      }
+      date.forEach((date_ele)=>{
+        date_ele.innerHTML=today;
+      })
+      //date.innerHTML = today;
+    </script>
+
+    <!-- Validate Verification Code -->
+    <script type="text/javascript">
+      function verify(ele) {
+        code_inp = $("#" + ele.id)
+          .parent()
+          .children()[0];
+        code = code_inp.value;
+        if (code == "") {
+          code_inp.style.outline = "2px solid red";
+          $("#" + ele.id.split("-")[0] + "-error").html(
+            "Please Enter Valid Code!"
+          );
+        } else {
+          $.ajax({
+            url: "",
+            method: "post",
+            data: {
+              Action:'Verify',
+              Order_Id: ele.id.split("-")[0],
+              Code: code,
+              csrfmiddlewaretoken: $('[name="csrfmiddlewaretoken"]').val(),
+            },
+            success: function (data) {
+              location.reload();
+            },
+          });
+        }
+      }
+    </script>
+
+    <!-- Drop the Passenger -->
+    <script type="text/javascript">
+      function drop(ele) {
+        order_id = ele.id.split("-")[0];
+        $.ajax({
+          url: "",
+          method: "post",
+          data: {
+            Action:'Drop',
+            Order_Id: order_id,
+            csrfmiddlewaretoken: $('[name="csrfmiddlewaretoken"]').val(),
+          },
+          success: function (data) {
+            location.reload();
+          },
+        });
+      }
+    </script>
+  </body>
+</html>

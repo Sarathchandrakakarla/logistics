@@ -1,0 +1,214 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="icon"
+      type="image/x-icon"
+      href="{% static 'img/favicon.ico' %}"
+    />
+    <link rel="stylesheet" href="{% static 'css/registration-form.css' %}" />
+    <!-- Material Icons -->
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+    <title>Hasthi</title>
+    <style>
+      body {
+        height: 110%;
+        padding-bottom: 50px;
+      }
+      #required {
+        color: red;
+      }
+      .content-container {
+        height: 750px;
+      }
+    </style>
+  </head>
+  <body>
+    {% include 'admin_fullnav.html' %}
+    <div class="form-container">
+      <div class="content-container">
+        <div class="title">Driver Registration</div>
+        {% if Status == "Creation_Success" %}
+        <div class="alert alert-success" role="alert">
+          New Driver Created Successfully!!
+        </div>
+        {% elif Status == "Updation_Success" %}
+        <div class="alert alert-success" role="alert">
+          Driver Updated Successfully!!
+        </div>
+        {% elif Status == "Updation_Failed" %}
+        <div class="alert alert-success" role="alert">
+          Driver Updation Failed!!
+        </div>
+        {% endif %}
+        <div class="content">
+          <form action="" method="post">
+            {% csrf_token %}
+            <div class="user-details">
+              <div class="input-box">
+                <span class="details"
+                  >Username <span id="required">*</span></span
+                >
+                <input
+                  type="text"
+                  placeholder="Enter Username"
+                  name="Username"
+                  id="username"
+                  oninput="this.value = this.value.toUpperCase();"
+                  onchange="getDetails(this.value.trim())"
+                  required
+                />
+              </div>
+              <div class="input-box">
+                <span class="details"
+                  >Full Name <span id="required">*</span></span
+                >
+                <input
+                  type="text"
+                  placeholder="Enter name"
+                  name="Full_Name"
+                  id="full_name"
+                  required
+                />
+              </div>
+              <div class="input-box">
+                <span class="details">Email</span>
+                <input
+                  type="email"
+                  placeholder="Enter email"
+                  name="Email"
+                  id="email"
+                />
+              </div>
+              <div class="input-box">
+                <span class="details"
+                  >Phone Number <span id="required">*</span></span
+                >
+                <input
+                  type="text"
+                  maxlength="10"
+                  minlength="10"
+                  placeholder="Enter number"
+                  name="Mobile"
+                  id="mobile"
+                  required
+                />
+              </div>
+              <div class="input-box">
+                <span class="details"
+                  >Password <span id="required">*</span></span
+                >
+                <input
+                  type="text"
+                  placeholder="Enter password"
+                  name="Password"
+                  id="password"
+                  required
+                />
+              </div>
+              <div class="input-box">
+                <span class="details">Generate Random Password</span>
+                <button
+                  class="btn btn-primary"
+                  type="button"
+                  onclick="generatePassword()"
+                >
+                  Generate Password
+                </button>
+              </div>
+              <div class="input-box">
+                <span class="details">Bus No</span>
+                <input
+                  type="text"
+                  placeholder="Enter bus no"
+                  name="Bus_No"
+                  id="bus_no"
+                />
+              </div>
+            </div>
+            <span id="required"
+              >Please Do Not Change Username for Updating Driver Details</span
+            >
+            <div class="button">
+              <input type="submit" name="Register" value="Register" />
+              <input type="submit" name="Update" value="Update" />
+              <input
+                type="submit"
+                name="Delete"
+                value="Delete"
+                onclick="if(!confirm('Confirm to Delete Driver?')){return false;}else{return true;}"
+              />
+              <input type="reset" value="Clear" />
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scripts -->
+
+    <!-- Generate Random Password -->
+    <script type="text/javascript">
+      function generatePassword(length = 6) {
+        let result = "";
+        const characters =
+          "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+
+        for (let i = 0; i < length; i++) {
+          result += characters.charAt(
+            Math.floor(Math.random() * characters.length)
+          );
+        }
+        const password_input = document.getElementById("password");
+        password_input.value = result;
+      }
+    </script>
+
+    <!-- To get Admin Details for Viewing and Modifying -->
+    <script type="text/javascript">
+      function getDetails(username) {
+        if (username != "") {
+          $.ajax({
+            type: "post",
+            url: "",
+            data: {
+              Action: "Get_Details",
+              Username: username,
+              csrfmiddlewaretoken: $("[name='csrfmiddlewaretoken']").val(),
+            },
+            success: function (data) {
+              if (data != "") {
+                data = data.split(",");
+                document.getElementById("full_name").value = data[0];
+                document.getElementById("email").value = data[1];
+                document.getElementById("mobile").value = data[2];
+                document.getElementById("password").value = data[3];
+                document.getElementById("bus_no").value = data[4];
+              } else {
+                document.getElementById("full_name").value = "";
+                document.getElementById("email").value = "";
+                document.getElementById("mobile").value = "";
+                document.getElementById("password").value = "";
+                document.getElementById("bus_no").value = "";
+              }
+            },
+          });
+        } else {
+          document.getElementById("full_name").value = "";
+          document.getElementById("email").value = "";
+          document.getElementById("mobile").value = "";
+          document.getElementById("password").value = "";
+          document.getElementById("bus_no").value = "";
+        }
+      }
+    </script>
+  </body>
+</html>

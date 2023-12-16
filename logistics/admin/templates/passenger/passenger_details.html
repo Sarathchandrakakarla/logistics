@@ -1,0 +1,155 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="icon"
+      type="image/x-icon"
+      href="{% static 'img/favicon.ico' %}"
+    />
+    <!-- Material Icons -->
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+    <title>Hasthi</title>
+    <style>
+      body {
+        height: 110%;
+        padding-bottom: 50px;
+      }
+      .table-container {
+        max-width: 100vw;
+        max-height: 500px;
+        overflow: scroll;
+      }
+      @media screen and (max-width: 900px) {
+        .table-container {
+          max-width: 90vw;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    {% include 'admin_fullnav.html' %}
+    <div class="container mt-5">
+      <h2 class="text-center">View Passenger Details</h2>
+      <div class="row mt-3">
+        <div class="col-lg-3">
+          <h4>Search Passenger By</h4>
+        </div>
+        <div class="col-lg-4">
+          <div class="form-check form-check-inline">
+            <input
+              class="form-check-input"
+              type="radio"
+              name="search_by"
+              id="full_name"
+              checked
+              value="Full_Name"
+            />
+            <label class="form-check-label" for="full_name">Full Name</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input
+              class="form-check-input"
+              type="radio"
+              name="search_by"
+              id="username"
+              value="Username"
+            />
+            <label class="form-check-label" for="username">Username</label>
+          </div>
+        </div>
+      </div>
+      <div class="row mt-4">
+        <div class="col-lg-3">
+          <strong
+            >Enter Passenger's <span id="search_label">Full Name </span></strong
+          >
+        </div>
+        {% csrf_token %}
+        <div class="col-lg-3">
+          <input
+            type="text"
+            class="form-control"
+            name="Search_Inp"
+            id="search_inp"
+            oninput="fetchData()"
+          />
+        </div>
+      </div>
+
+      <div class="table-container mt-5">
+        <table class="table table-striped">
+          <thead class="bg-secondary">
+            <th>S No.</th>
+            <th>Username</th>
+            <th>Full Name</th>
+            <th>Email</th>
+            <th>Mobile</th>
+            <th>DOB</th>
+          </thead>
+          <tbody id="passenger_list"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Scripts -->
+
+    <!-- Change Labels -->
+    <script type="text/javascript">
+      $(document).on("change", (e) => {
+        radio = e.target.id;
+        switch (radio) {
+          case "username":
+            $("#search_label").html("Username");
+            break;
+          case "full_name":
+            $("#search_label").html("Full Name");
+            break;
+        }
+      });
+    </script>
+
+    <!-- Get Passenger Details -->
+    <script type="text/javascript">
+      // Fetch Data from Database and Display in Table
+      function fetchData() {
+        var search_val = $("#search_inp").val().trim();
+        if (document.getElementById("full_name").checked) {
+          search_type = "Full_Name";
+        } else {
+          search_type = "Username";
+        }
+        if (search_val == "") {
+            $("#passenger_list").empty();
+        } else {
+          $.ajax({
+            url: "",
+            method: "POST",
+            data: {
+              Action: "Fetch_List",
+              Search_Type: search_type,
+              Search_Value: search_val,
+              csrfmiddlewaretoken: $('[name="csrfmiddlewaretoken"]').val(),
+            },
+            success: function (data) {
+              if (data == "") {
+                $("#passenger_list").empty().append(
+                    "<tr><td colspan='6' class='text-center'>No Passenger Found with " + search_type +" : " + search_val + "</td></tr>"
+                );
+              } else {
+                $("#passenger_list").empty().append(data);
+              }
+            },
+          });
+        }
+      }
+    </script>
+  </body>
+</html>
