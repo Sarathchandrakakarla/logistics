@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- mdBootstrap CDN -->
+    <!-- MDB -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.2/mdb.min.css"
+      rel="stylesheet"
+    />
+    <!-- Font Awesome Icons -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <!-- MDB -->
+    <script
+      type="text/javascript"
+      src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.2/mdb.min.js"
+    ></script>
+
+    <!-- Sidebar CSS -->
+    <link rel="stylesheet" href="side.css" />
+
+    <title>Catch Your Bus</title>
+  </head>
+  <style>
+    body {
+      background: #b9b4c7 !important;
+    }
+    .navbar {
+      height: 70px;
+      background-color: #3a4664;
+    }
+    .navbar-brand h3{
+        margin-left: 50%;
+        font-family: 'Roboto',sans-serif;
+    }
+  </style>
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-dark navbar-expand-lg">
+        <!-- Container wrapper -->
+        <div class="container-fluid">
+          <a class="navbar-brand mt-2 mt-lg-0" href="#">
+              <!-- <img
+                src="https://mdbcdn.b-cdn.net/img/logo/mdb-transaprent-noshadows.webp"
+                height="15"
+                alt="MDB Logo"
+                loading="lazy"
+              /> -->
+              <h3>Catch Your Bus</h3>
+            </a>
+            <!-- Avatar -->
+            <div class="dropdown">
+              <a
+                class="dropdown-toggle d-flex mx-lg-5 align-items-center hidden-arrow"
+                href="#"
+                id="navbarDropdownMenuAvatar"
+                role="button"
+                data-mdb-toggle="dropdown"
+                aria-expanded="false"
+              >
+                <img
+                  src="https://mdbcdn.b-cdn.net/img/new/avatars/2.webp"
+                  class="rounded-circle"
+                  height="50"
+                  alt="Black and White Portrait of a Man"
+                  loading="lazy"
+                />
+              </a>
+              <ul
+                class="dropdown-menu dropdown-menu-end"
+                aria-labelledby="navbarDropdownMenuAvatar"
+              >
+                <li>
+                  <a class="dropdown-item" href="#">My profile</a>
+                </li>
+                <li>
+                  <a class="dropdown-item" href="#">Settings</a>
+                </li>
+                <li>
+                  <a class="dropdown-item" href="#">Logout</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+    </nav>
+    <input type="checkbox" id="check">
+    <label for="check" id="hamburger">
+      <i class="fas fa-bars" id="btn"></i>
+      <i class="fas fa-times" id="cancel"></i>
+    </label>
+    <div class="sidebar">
+    <header>My App</header>
+    <ul id="sidebar-menu">
+     <li><a href="#"><i class="fas fa-qrcode"></i>Dashboard</a></li>
+     <li><a href="#"><i class="fas fa-link"></i>Shortcuts</a></li>
+     <li><a href="#"><i class="fas fa-stream"></i>Overview</a></li>
+     <li><a href="#"><i class="fas fa-calendar-week"></i>Events</a></li>
+     <li><a href="#"><i class="far fa-question-circle"></i>About</a></li>
+     <li><a href="#"><i class="fas fa-sliders-h"></i>Services</a></li>
+     <li><a href="#"><i class="far fa-envelope"></i>Contact</a></li>
+    </ul>
+   </div>
+  </body>
+</html>

@@ -1,0 +1,945 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="icon"
+      type="image/x-icon"
+      href="{% static 'img/favicon.ico' %}"
+    />
+    <link rel="stylesheet" href="{% static 'css/booking-form.css' %}" />
+    <!-- Material Icons -->
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <!-- Lottie Player -->
+    <script
+      src="https://unpkg.com/@dotlottie/player-component@latest/dist/dotlottie-player.mjs"
+      type="module"
+    ></script>
+    <!-- Maps API -->
+    <!-- <script src="https://apis.mappls.com/advancedmaps/api/e20842ba16f667707c1995bbf2487d5d/map_sdk?layer=vector&v=3.0&callback=initMap1" defer></script>
+    <script src="https://apis.mappls.com/advancedmaps/api/e20842ba16f667707c1995bbf2487d5d/map_sdk_plugins?v=3.0" defer></script>
+    <script src="https://apis.mappls.com/advancedmaps/api/e20842ba16f667707c1995bbf2487d5d/map_sdk_plugins?v=3.0&libraries=nearby" defer></script> -->
+
+    <title>Catch Your Bus</title>
+    <style>
+      body {
+        height: 110%;
+        padding-bottom: 50px;
+      }
+      .booking-form {
+        /* background-color: #076cbe; */
+        background-color: #0cd556;
+      }
+      .content-container {
+        margin-left: 15%;
+      }
+      .bus-animation {
+        border: none;
+        background: transparent;
+      }
+      .map {
+        width: 100%;
+        height: 60vh;
+        margin-left: -100px;
+      }
+      .video-row {
+        margin-top: 405px;
+        margin-left: 30%;
+      }
+      .text-row {
+        margin-top: 450px;
+        width: 70vw;
+      }
+      .nearby-head {
+        color: black;
+        margin-top: 600px;
+      }
+
+      @media screen and (max-width: 900px) {
+        .map {
+          margin-left: -35px !important;
+          width: 90vw !important;
+        }
+
+        .nearby-head {
+          margin-top: 700px;
+        }
+      }
+
+      /* Input Suggestions */
+      .suggestions {
+        width: 100%;
+        background: #fff;
+        text-align: left;
+        position: absolute;
+        top: 60px;
+        border-radius: 10px;
+        z-index: 100;
+      }
+
+      .suggestions ul {
+        display: none;
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+        max-height: 200px;
+        overflow-y: auto;
+      }
+      .suggestions ul.has-suggestions {
+        display: block;
+        height: 150px;
+        overflow-y: scroll;
+      }
+      .suggestions ul li {
+        padding: 10px;
+        padding-left: 30px;
+        cursor: pointer;
+        border-radius: 40px;
+        background: rgba(255, 255, 255, 0.2);
+      }
+      .suggestions ul li:hover {
+        background-color: #e65c00;
+        color: #fff;
+      }
+
+      /* Switch */
+      .switch {
+        position: relative;
+        display: inline-block;
+        width: 60px;
+        height: 34px;
+        left: 280px;
+        bottom: 20px;
+        box-shadow: none;
+      }
+      .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        -webkit-transition: 0.4s;
+        transition: 0.4s;
+      }
+      .slider:before {
+        position: absolute;
+        content: "";
+        height: 26px;
+        width: 26px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        -webkit-transition: 0.4s;
+        transition: 0.4s;
+      }
+      #route_type:checked + .slider {
+        background-color: #2196f3;
+      }
+      #route_type:focus + .slider {
+        box-shadow: 0 0 1px #2196f3;
+      }
+      #route_type:checked + .slider:before {
+        -webkit-transform: translateX(26px);
+        -ms-transform: translateX(26px);
+        transform: translateX(26px);
+      }
+      .slider.round {
+        border-radius: 34px;
+      }
+      .slider.round:before {
+        border-radius: 50%;
+      }
+      .switch-label1 {
+        left: 180px;
+        color: white;
+        white-space: nowrap;
+      }
+      .switch-label2 {
+        left: 320px;
+        color: white;
+        white-space: nowrap;
+      }
+
+      @media screen and (max-width: 900px) {
+        .switch {
+          left: 60px;
+        }
+
+        .switch-label1 {
+          left: 30px;
+          color: white;
+          white-space: pre-wrap;
+        }
+
+        .switch-label2 {
+          left: 80px;
+          color: white;
+          white-space: pre-wrap;
+        }
+      }
+      .select option {
+        background-color: rgba(5, 5, 5, 0.85);
+        color: #fff !important;
+      }
+
+      @media screen and (max-width: 980px) {
+        .colon {
+          text-align: center;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    {% include 'user_fullnav.html' %}
+    <div class="content-container mt-5">
+      <form action="" method="post" id="booking-form">
+        {% csrf_token %}
+        <div id="booking" class="section">
+          <div class="section-center">
+            <div class="container">
+              <div class="row">
+                <div class="booking-form">
+                  <div class="form-header">
+                    <h1>Journey Details</h1>
+                    <hr style="color: #fff; height: 2px" />
+                  </div>
+                  <form>
+                    <span class="switch switch-label1"
+                      >Institution to City</span
+                    >
+                    <label class="switch">
+                      <input
+                        type="checkbox"
+                        id="route_type"
+                        name="Route_Type"
+                      />
+                      <span class="slider round"></span>
+                    </label>
+                    <span class="switch switch-label2"
+                      >City to Institution</span
+                    >
+                    <div class="row">
+                      <div class="col-md-6">
+                        <div class="form-group">
+                          <input
+                            class="form-control from-inp"
+                            type="text"
+                            name="From"
+                            id="from"
+                            placeholder="Departure Location (Min 3 letters)"
+                            onchange="getNearbyPlaces('from')"
+                            hidden
+                          />
+                          <div class="suggestions from_suggestions">
+                            <ul></ul>
+                          </div>
+                          <select
+                            name="From_Sel"
+                            class="form-control select from-sel"
+                            id="from"
+                          >
+                            <option value="">-- Select Institution --</option>
+                            {% for college in Colleges %}
+                            <option value="{{college.Name}}">
+                              {{college.Name}}
+                            </option>
+                            {% endfor %}
+                          </select>
+                          <span class="form-label">From</span>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="form-group">
+                          <input
+                            class="form-control to-inp"
+                            type="text"
+                            name="To"
+                            id="to"
+                            placeholder="Destination Location (Min 3 letters)"
+                            onchange="//getNearbyPlaces('to')"
+                          />
+                          <div class="places" style="display: none">
+                            <ul>
+                              {% for college in Colleges %}
+                              <li>{{college.Name}}</li>
+                              {% endfor %}
+                            </ul>
+                          </div>
+                          <div class="suggestions to_suggestions">
+                            <ul></ul>
+                          </div>
+                          <select
+                            name="To_Sel"
+                            class="form-control select to-sel"
+                            id="to"
+                            hidden
+                          >
+                            <option value="">-- Select Institution --</option>
+                            {% for college in Colleges %}
+                            <option value="{{college.Name}}">
+                              {{college.Name}}
+                            </option>
+                            {% endfor %}
+                          </select>
+                          <span class="form-label">To</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-6">
+                        <div class="form-group">
+                          <input
+                            class="form-control"
+                            type="date"
+                            name="Date"
+                            id="date"
+                            required
+                          />
+                          <span class="form-label">Date of Journey</span>
+                          <span id="Date_Error" style="color: red"></span>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="form-group">
+                          <div class="row time">
+                            <div class="col-lg-5">
+                              <select
+                                name="Hours"
+                                class="form-control"
+                                id="hours"
+                                required
+                              >
+                                <option value="">HH</option>
+                                {% for hour in Hours %}
+                                <option value="{{hour}}">{{hour}}</option>
+                                {% endfor %}
+                              </select>
+                            </div>
+                            <div class="col-lg-1 colon">
+                              <h1 style="color: #fff">:</h1>
+                            </div>
+                            <div class="col-lg-5">
+                              <select
+                                name="Minutes"
+                                class="form-control"
+                                id="minutes"
+                                required
+                              >
+                                <option value="">MM</option>
+                                {% for minute in Minutes %}
+                                <option value="{{minute}}">{{minute}}</option>
+                                {% endfor %}
+                              </select>
+                            </div>
+                          </div>
+                          <span class="form-label"
+                            >Preferred Time of Journey</span
+                          >
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-6">
+                        <div class="form-group">
+                          <input
+                            class="form-control"
+                            type="number"
+                            name="No_Of_Persons"
+                            id="no_of_persons"
+                            placeholder="No of Persons"
+                            min="1"
+                            required
+                          />
+                          <span class="form-label">No of Persons</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-btn">
+                      <button
+                        class="submit-btn"
+                        id="book-btn"
+                        name="Book"
+                        value=" "
+                      >
+                        Book
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+
+      {% if Booked %}
+      <div class="video-row">
+        <dotlottie-player
+          src="https://lottie.host/468666fe-12de-4d3e-8524-a3cfc64967c8/bjErgKuN4U.json"
+          background="transparent"
+          speed="1"
+          style="width: 250px; height: 250px"
+          direction="1"
+          autoplay
+          id="done"
+        ></dotlottie-player>
+      </div>
+      <div class="text-row" style="display: none">
+        <div class="alert alert-success" role="alert">
+          <h4 class="alert-heading">Congrats!</h4>
+          <p>
+            Your Journey is in Queue! You Will be Notified before 2 days of your
+            Journey!🎉🎉🥳
+          </p>
+          <hr />
+          <p class="mb-0">Thank You for Choosing and Believing Us!!</p>
+        </div>
+      </div>
+      {% endif %}
+      <h2 class="nearby-head">Explore Nearby Places</h2>
+      <div class="map" id="map"></div>
+    </div>
+
+    <!-- Scripts -->
+
+    <!-- Booking Form Validation -->
+    <script type="text/javascript">
+      function validateForm() {
+        const route_type = document.getElementById("route_type");
+        var source_status = 0;
+        var destination_status = 0;
+        var source_status = 0;
+        if (!route_type.checked) {
+          const source = document.querySelector(".from-sel").value;
+          const destination = document.querySelector(".to-inp").value;
+          if (!source) {
+            source_status = 0;
+          } else {
+            source_status = 1;
+          }
+          if (!destination) {
+            destination_status = 0;
+          } else {
+            destination_status = 1;
+          }
+        } else {
+          const source = document.querySelector(".from-inp").value;
+          const destination = document.querySelector(".to-sel").value;
+        }
+        if (!source_status) {
+          if (!route_type.checked) {
+            $(".from-sel").css("outline", "2px solid red");
+            $(".from-sel").focus();
+          } else {
+            $(".from-inp").css("outline", "2px solid red");
+            $(".from-inp").focus();
+          }
+        }
+        if (!destination_status) {
+          if (!route_type.checked) {
+            $(".to-inp").css("outline", "2px solid red");
+            $(".to-inp").focus();
+          } else {
+            $(".to-sel").css("outline", "2px solid red");
+            $(".to-sel").focus();
+          }
+        }
+        if (source_status == 1 && destination_status == 1) {
+          return true;
+        } else {
+          return false;
+        }
+      }
+      $("#booking-form").on("submit", () => {
+        window.onbeforeunload = null;
+        return validateForm();
+      });
+      $("#date").on("change", () => {
+        date_obj = new Date();
+        date = $("#date").val();
+        today =
+          date_obj.getFullYear() +
+          "-" +
+          (date_obj.getMonth() + 1) +
+          "-" +
+          (date_obj.getDate() < 10
+            ? "0" + date_obj.getDate()
+            : date_obj.getDate());
+        if (date < today) {
+          $("#date").css("outline", "2px solid red");
+          $("#Date_Error").html("Enter a Valid Date");
+          $("#date").focus();
+        } else {
+          $("#date").css("outline", "none");
+          $("#Date_Error").html("");
+        }
+      });
+    </script>
+
+    <!-- Nearby Places API -->
+    <script type="text/javascript">
+      function getNearbyPlaces(id) {
+        let to_id = id;
+        setTimeout(() => {
+          to = $("#" + to_id).val();
+          if (to != "") {
+            /*Nearby plugin initialization*/
+            map = new mappls.Map("map", {
+              center: { lat: 28.612964, lng: 77.229463 },
+              zoom: 9,
+            });
+            var options = {
+              map: map,
+              //divId: "nearby_search",
+              keywords: "restaurants",
+              refLocation: [28.632735, 77.219696],
+              //refLocation: [to_eloc],
+              fitbounds: true,
+              geolocation: true,
+              click_callback: function (d) {
+                console.log(d);
+              },
+            };
+
+            //mappls.nearby(options, callback); //Function Call
+          }
+        }, 500);
+      }
+      function callback(data) {
+        console.log(data);
+      }
+    </script>
+
+    <!-- Distance API -->
+    <script type="text/javascript">
+      function calculateDistance(from, to) {
+        var distance = 0;
+        var locs = from + ";" + to;
+        mappls.getDistance(
+          {
+            //Kodur, Rajampet Distance (44173: By API)  (45km by Google Maps) (44173m : 44km )
+            coordinates: "", //"13.9553622,79.3397819;14.1937301,79.1360947",
+          },
+          function (data) {
+            distance = data.results.distances[0][1];
+            console.log(data);
+          }
+        );
+        setTimeout(() => {
+          console.log(distance);
+        }, 500);
+        return distance;
+      }
+      $("#from").on("change", () => {
+        from = $("#from").val();
+        to = $("#to").val();
+        if (from != "" && to != "") {
+          setTimeout(() => {
+            var dist = calculateDistance(from_eloc, to_eloc);
+            setTimeout(() => {
+              dist = dist / 1000; //Changing Meters to Kilometers
+              if (dist > 10) {
+                alert(
+                  "Your Arrival Location is far way from our Pickup Location!"
+                );
+              }
+            }, 300);
+          }, 500);
+        }
+      });
+      $("#to").on("change", () => {
+        from = $("#from").val();
+        to = $("#to").val();
+        if (from != "" && to != "") {
+          setTimeout(() => {
+            var dist = calculateDistance(from_eloc, to_eloc);
+            dist = dist / 1000; //Changing Meters to Kilometers
+            console.log(dist);
+            if (dist > 10) {
+              alert(
+                "Your Destination Location is far way from our Drop Location!"
+              );
+            }
+          }, 500);
+        }
+      });
+    </script>
+
+    <!-- Text Suggest API -->
+    <script type="text/javascript">
+      var from_eloc = "";
+      var to_eloc = "";
+      function initMap1() {
+        if (!document.getElementById("from").classList.contains("select")) {
+          //new mappls.search(document.getElementById("from"), callback_from);
+        }
+        if (!document.getElementById("to").classList.contains("select")) {
+          //new mappls.search(document.getElementById("to"), callback_to);
+        }
+        function callback_from(data) {
+          if (data) {
+            var dt = data[0];
+            var placeName = dt["placeName"];
+            from_eloc = dt["eLoc"];
+            if (placeName == "Current Location") {
+              var lat = dt["latitude"];
+              var lon = dt["longitude"];
+              var res = fetch(
+                "https://apis.mapmyindia.com/advancedmaps/v1/37a02b3ee6abf2878ef11efc92c43c09/rev_geocode?lat=" +
+                  lat +
+                  "&lng=" +
+                  lon
+              )
+                .then((res_data) => {
+                  jsonData = res_data.text();
+                  return jsonData;
+                })
+                .then((jsonData) => {
+                  obj = JSON.parse(jsonData);
+                  placeName =
+                    obj.results[0].subLocality + ", " + obj.results[0].locality;
+                  document.querySelector("#from").value = placeName;
+                });
+            } else {
+              document.querySelector("#from").value = placeName;
+            }
+            if (!dt) return false;
+            var eloc = dt.eLoc;
+            var place = dt.placeName;
+          }
+        }
+
+        function callback_to(data) {
+          if (data) {
+            var dt = data[0];
+            var placeName = dt["placeName"];
+            to_eloc = dt["eLoc"];
+            if (placeName == "Current Location") {
+              var lat = dt["latitude"];
+              var lon = dt["longitude"];
+              var res = fetch(
+                "https://apis.mapmyindia.com/advancedmaps/v1/37a02b3ee6abf2878ef11efc92c43c09/rev_geocode?lat=" +
+                  lat +
+                  "&lng=" +
+                  lon
+              )
+                .then((res_data) => {
+                  jsonData = res_data.text();
+                  return jsonData;
+                })
+                .then((jsonData) => {
+                  obj = JSON.parse(jsonData);
+                  placeName =
+                    obj.results[0].subLocality + ", " + obj.results[0].locality;
+                  document.querySelector("#to").value = placeName;
+                });
+            } else {
+              document.querySelector("#to").value = placeName;
+            }
+            if (!dt) return false;
+            var eloc = dt.eLoc;
+            var place = dt.placeName;
+          }
+        }
+      }
+    </script>
+
+    <!-- Prevent Form Submission on Enter -->
+    <script type="text/javascript">
+      $(document).on("keypress", (e) => {
+        if (e.keyCode == 13) {
+          e.preventDefault();
+        }
+      });
+    </script>
+
+    <!-- Nearby Places Display-->
+    <script type="text/javascript">
+      $("#to").on("change", () => {
+        place = $("#to").val();
+        if (place != "") {
+          $.ajax({
+            type: "post",
+            url: "",
+            data: {
+              csrfmiddlewaretoken: document.querySelector(
+                "[name=csrfmiddlewaretoken]"
+              ).value,
+              Place: place,
+            },
+            success: function (data) {
+              $("#nearby_places").html(data);
+            },
+          });
+        }
+      });
+    </script>
+
+    <!-- Confirm to Page Reload after Data Entry -->
+    <script type="text/javascript">
+      window.onbeforeunload = function (e) {
+        e = e || window.event;
+        if ($("#from").val() != "" || $("#to").val() != "") {
+          return "Sure?";
+        }
+      };
+    </script>
+
+    <!-- Booking Animation -->
+    <script type="text/javascript">
+      let animation = document.getElementById("done");
+      animation.addEventListener("complete", () => {
+        document.querySelector(".video-row").style.display = "none";
+        document.querySelector(".text-row").style.display = "block";
+        document.querySelector(".nearby-head").style.margin = "0";
+      });
+    </script>
+
+    <!-- Route Type Switch -->
+    <script type="text/javascript">
+      let swt = document.getElementById("route_type");
+      let from_inp = document.querySelector(".from-inp");
+      let from_sel = document.querySelector(".from-sel");
+      let to_inp = document.querySelector(".to-inp");
+      let to_sel = document.querySelector(".to-sel");
+      swt.addEventListener("click", () => {
+        if (swt.checked) {
+          from_sel.hidden = "hidden";
+          from_inp.hidden = "";
+          to_sel.hidden = "";
+          to_inp.hidden = "hidden";
+        } else {
+          from_sel.hidden = "";
+          from_inp.hidden = "hidden";
+          to_sel.hidden = "hidden";
+          to_inp.hidden = "";
+        }
+      });
+    </script>
+
+    <!-- Days Difference -->
+    <script type="text/javascript">
+      //DEPRECATED
+      /*
+      $("#date").on("change", () => {
+        const date = new Date();
+        let today =
+          date.getFullYear() + "-" + parseInt(date.getMonth() + 1) + "-";
+        const todayDate = date.getDate();
+        if (todayDate < 10) {
+          today += "0" + todayDate;
+        } else {
+          today += todayDate;
+        }
+        var timediff = new Date($("#date").val()).getTime() - date.getTime();
+        var daydiff = Math.round(timediff / (1000 * 3600 * 24));
+        if (daydiff < 0) {
+          $("#Date_Error").html("⚠️  Enter a Valid Date");
+        } else if (daydiff < 3) {
+          $("#Date_Error").html("⚠️  Date should be 3-4 days before journey");
+        } else {
+          $("#Date_Error").html("");
+        }
+        //⚠️  Date should be 3 days before journey
+      });
+      */
+    </script>
+
+    <script type="text/javascript">
+      const from_input = document.querySelector(".from-inp");
+      const to_input = document.querySelector(".to-inp");
+      const from_suggestions = document.querySelector(".from_suggestions ul");
+      const to_suggestions = document.querySelector(".to_suggestions ul");
+      const placeslist = document.querySelectorAll(".places ul li");
+      const places = [];
+      placeslist.forEach((place) => {
+        places.push(place.innerHTML);
+      });
+
+      function search(str) {
+        let results = [];
+        const val = str.toLowerCase();
+
+        for (i = 0; i < places.length; i++) {
+          if (places[i].toLowerCase().indexOf(val) > -1) {
+            results.push(places[i]);
+          }
+        }
+
+        return results;
+      }
+
+      function searchHandler(e) {
+        if (!swt.checked) {
+          suggestions = to_suggestions;
+        } else {
+          suggestions = from_suggestions;
+        }
+        const inputVal = e.currentTarget.value;
+        let results = [];
+        if (inputVal.length > 0) {
+          results = search(inputVal);
+        }
+        showSuggestions(results, inputVal);
+      }
+
+      function showSuggestions(results, inputVal) {
+        if (!swt.checked) {
+          suggestions = to_suggestions;
+        } else {
+          suggestions = from_suggestions;
+        }
+        suggestions.innerHTML = "";
+
+        if (results.length > 0) {
+          for (i = 0; i < results.length; i++) {
+            let item = results[i];
+            const match = item.match(new RegExp(inputVal, "i"));
+            item = item.replace(match[0], `<strong>${match[0]}</strong>`);
+            suggestions.innerHTML += `<li>${item}</li>`;
+          }
+          suggestions.classList.add("has-suggestions");
+        } else {
+          results = [];
+          suggestions.innerHTML = "";
+          suggestions.classList.remove("has-suggestions");
+        }
+      }
+
+      function useSuggestion(e) {
+        if (!swt.checked) {
+          input = to_input;
+        } else {
+          input = from_input;
+        }
+        input.value = e.target.innerText;
+        input.focus();
+        suggestions.innerHTML = "";
+        suggestions.classList.remove("has-suggestions");
+      }
+
+      from_input.addEventListener("keyup", searchHandler);
+      to_input.addEventListener("keyup", searchHandler);
+      from_suggestions.addEventListener("click", useSuggestion);
+      to_suggestions.addEventListener("click", useSuggestion);
+    </script>
+
+    <!-- Select Text Suggest -->
+    <script type="text/javascript">
+      /* const from_input = document.querySelector(".from-inp");
+      const to_input = document.querySelector(".to-inp");
+      const from_suggestions = document.querySelector(".from_suggestions ul");
+      const to_suggestions = document.querySelector(".to_suggestions ul");
+
+      const placeslist = document.querySelectorAll(".places ul li");
+      const places = [];
+      placeslist.forEach((place) => {
+        places.push(place.innerHTML);
+      });
+      function search(str) {
+        let results = [];
+        const val = str.toLowerCase();
+        for (i = 0; i < places.length; i++) {
+          if (places[i].toLowerCase().indexOf(val) > -1) {
+            results.push(places[i]);
+          }
+        }
+        return results;
+      } 
+
+      function searchHandler(e) {
+        if (!swt.checked) {
+          suggestions = to_suggestions;
+        } else {
+          suggestions = from_suggestions;
+        }
+        const inputVal = e.currentTarget;
+        let results = [];
+        if (inputVal.value.length > 0) {
+          results = search(inputVal.value);
+          showSuggestions(results, inputVal);
+        } else {
+          results = [];
+          suggestions.innerHTML = "";
+          suggestions.classList.remove("has-suggestions");
+        }
+      }
+
+      function showSuggestions(results, inputVal) {
+        inputVal.innerHTML = "";
+        if (!swt.checked) {
+          suggestions = to_suggestions;
+        } else {
+          suggestions = from_suggestions;
+        }
+
+        if (results.length > 0) {
+          suggestions.innerHTML = "";
+          for (i = 0; i < results.length; i++) {
+            let item = results[i];
+            const match = item.match(new RegExp(inputVal.value, "i"));
+            item = item.replace(match[0], `<strong>${match[0]}</strong>`);
+            suggestions.innerHTML += `<li>${item}</li>`;
+          }
+          suggestions.classList.add("has-suggestions");
+        } else {
+          results = [];
+          suggestions.innerHTML = "";
+          suggestions.classList.remove("has-suggestions");
+        }
+      }
+
+      function useSuggestion(e) {
+        console.log(1);
+        /* if (!swt.checked) {
+          suggestions = to_suggestions;
+        } else {
+          suggestions = from_suggestions;
+        }
+        if (e.id == "from" && !e.classList.contains("select")) {
+          input = from_input;
+          suggestions = from_suggestions;
+        } else if (e.id == "to" && !e.classList.contains("select")) {
+          input = to_input;
+          suggestions = to_suggestions;
+        }
+        input.value = e.target.innerText;
+        input.focus();
+        suggestions.innerHTML = "";
+        suggestions.classList.remove("has-suggestions");
+      }
+
+      from_input.addEventListener("keyup", searchHandler);
+      to_input.addEventListener("keyup", searchHandler);
+      from_input.addEventListener("focus", searchHandler);
+      to_input.addEventListener("focus", searchHandler);
+      from_input.addEventListener("blur", () => {
+        suggestions.innerHTML = "";
+      });
+      to_input.addEventListener("blur", () => {
+        suggestions.classList.remove("has-suggestions");
+      });
+      document
+        .querySelector(".from_suggestions ul li")
+        .addEventListener("click", useSuggestion);
+      document
+        .querySelector(".to_suggestions ul")
+        .addEventListener("click", useSuggestion);
+      */
+    </script>
+  </body>
+</html>
