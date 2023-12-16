@@ -1,0 +1,117 @@
+@import url("https://fonts.googleapis.com/css?family=Roboto:300,400,400i,500");
+@import url("https://fonts.googleapis.com/css?family=Megrim:400");
+* {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  text-decoration: none;
+}
+body {
+  font-family: "Roboto", sans-serif;
+  background: #b9b4c7;
+}
+.navbar {
+  height: 70px;
+  /* background-color: #3a4664; */
+  /* background: #063146; */
+  background: #076028;
+}
+.navbar-brand{
+  margin-left: 6%;
+}
+.navbar-brand h3 {
+  margin-left: 10%;
+  font-family: "Megrim";
+  font-weight: bolder;
+  font-size: 35px;
+}
+.dropdown-menu {
+  /* background: #063146; */
+  background: #076028;
+}
+.dropdown-item {
+  color: #fff;
+}
+.dropdown-item:hover {
+  /* color: #063146; */
+  color: #076028;
+}
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: -250px;
+  width: 250px;
+  height: 100%;
+  /* background: #042331; */
+  background: #076028;
+  transition: all 0.5s ease;
+  z-index: 1000;
+}
+.sidebar header {
+  font-size: 22px;
+  color: white;
+  line-height: 68px;
+  text-align: center;
+  /* background: #063146; */
+  background: #076028;
+  user-select: none;
+}
+.sidebar #sidebar-menu a {
+  display: block;
+  height: 100%;
+  width: 100%;
+  line-height: 65px;
+  font-size: 20px;
+  color: white;
+  box-sizing: border-box;
+  border-bottom: 1px solid black;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  transition: 0.4s;
+  white-space: nowrap;
+}
+#sidebar-menu li:hover a {
+  padding-left: 10px;
+}
+.sidebar #sidebar-menu a i {
+  margin-right: 16px;
+}
+#check {
+  display: none;
+}
+#hamburger #btn,
+#hamburger #cancel {
+  position: absolute;
+  /* background: #042331; */
+  background: #023716;
+  border-radius: 3px;
+  cursor: pointer;
+}
+#hamburger #btn {
+  left: 10px;
+  top: 15px;
+  font-size: 25px;
+  color: white;
+  padding: 6px 12px;
+  transition: all 0.5s;
+}
+#hamburger #cancel {
+  z-index: 1111;
+  left: -175px;
+  top: 15px;
+  font-size: 30px;
+  /* color: #0a5275; */
+  color: #fff;
+  padding: 4px 9px;
+  transition: all 0.5s ease;
+}
+#check:checked ~ .sidebar {
+  left: 0;
+}
+#check:checked ~ #hamburger #btn {
+  left: 250px;
+  opacity: 0;
+  pointer-events: none;
+}
+#check:checked ~ #hamburger #cancel {
+  left: 210px;
+}
