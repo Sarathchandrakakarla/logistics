@@ -1,0 +1,361 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/x-icon" href="{% static 'img/Logo.png' %}">
+    <title>Catch Your Bus</title>
+    <link
+      href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans:400,600"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="{% static 'css/index.css' %}" />
+    <script src="https://unpkg.com/animejs@3.0.1/lib/anime.min.js"></script>
+    <script src="https://unpkg.com/scrollreveal@4.0.0/dist/scrollreveal.min.js"></script>
+
+    <!-- Navbar -->
+    <link
+      href="https://fonts.googleapis.com/css?family=Megrim:400"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap"
+      rel="stylesheet"
+    />
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"
+      charset="utf-8"
+    ></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css"
+    />
+  </head>
+  <style>
+    .header {
+      background-color: transparent !important;
+    }
+    .hero-figure-box-05 {
+      background: url('{% static "img/blue-bus.png" %}');
+      background-size: cover;
+    }
+
+    .hero-figure-box-06 {
+      background: url('{% static "img/bus3.png" %}');
+      background-size: cover;
+    }
+  </style>
+  <body class="is-boxed has-animations" onload="date()">
+    <div class="body-wrap">
+      {% include 'navbar.html' %}
+      <header class="site-header">
+        <div class="container">
+          <div class="site-header-inner">
+            <div class="brand header-brand">
+              <h1 class="m-0">
+                <a href="#">
+                  <img
+                    class="header-logo-image"
+                    src="{% static 'img/logo.svg' %}"
+                    alt="Logo"
+                  />
+                </a>
+              </h1>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main>
+        <section class="hero">
+          <div class="container">
+            <div class="hero-inner">
+              <div class="hero-copy">
+                <h1 class="hero-title mt-0">Go and explore the City !</h1>
+                <p class="hero-paragraph">
+                  Visit our website, explore the routes, and start planning your
+                  next point-to-point bus adventure. Your destination is just a
+                  click away!
+                </p>
+              </div>
+              <div class="hero-figure anime-element">
+                <svg
+                  class="placeholder"
+                  width="528"
+                  height="396"
+                  viewBox="0 0 528 396"
+                >
+                  <rect width="528" height="396" style="fill: transparent" />
+                </svg>
+                <div
+                  class="hero-figure-box hero-figure-box-01"
+                  data-rotation="45deg"
+                ></div>
+                <div
+                  class="hero-figure-box hero-figure-box-02"
+                  data-rotation="-45deg"
+                ></div>
+                <div
+                  class="hero-figure-box hero-figure-box-03"
+                  data-rotation="0deg"
+                ></div>
+                <div
+                  class="hero-figure-box hero-figure-box-04"
+                  data-rotation="-135deg"
+                ></div>
+                <div class="hero-figure-box hero-figure-box-05"></div>
+                <div class="hero-figure-box hero-figure-box-06"></div>
+                <!-- <div class="hero-figure-box hero-figure-box-07"></div> -->
+                <div
+                  class="hero-figure-box hero-figure-box-08"
+                  data-rotation="-22deg"
+                ></div>
+                <div
+                  class="hero-figure-box hero-figure-box-09"
+                  data-rotation="-52deg"
+                ></div>
+                <div
+                  class="hero-figure-box hero-figure-box-10"
+                  data-rotation="-50deg"
+                ></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="features section">
+          <div class="container">
+            <div class="features-inner section-inner has-bottom-divider">
+              <div class="features-wrap">
+                <div class="feature text-center is-revealing">
+                  <div class="feature-inner">
+                    <div class="feature-icon">
+                      <img
+                        src="{% static 'img/icon1.svg' %}"
+                        alt="Feature 01"
+                        width="122px"
+                        style="filter: invert(1)"
+                      />
+                    </div>
+                    <h4 class="feature-title mt-24">
+                      Point to Point Transport
+                    </h4>
+                    <p class="text-sm mb-0">
+                      Imagine reaching your destination without any unnecessary
+                      stops or delays. Point-to-Point Transport is your express
+                      ticket to a swift and direct path, ensuring you get to
+                      where you need to be, right on time.
+                    </p>
+                  </div>
+                </div>
+                <div class="feature text-center is-revealing">
+                  <div class="feature-inner">
+                    <div class="feature-icon">
+                      <img
+                        src="{% static 'img/icon2.png' %}"
+                        alt="Feature 02"
+                        width="120px"
+                        style="filter: invert(1)"
+                      />
+                    </div>
+                    <h4 class="feature-title mt-24">Hope Your Ride</h4>
+                    <p class="text-sm mb-0">
+                      Life in the city can be a whirlwind of chaos, but your
+                      daily commute doesn't have to be. Enter the world of "Hope
+                      Your Ride," where we're dedicated to making your everyday
+                      journeys smoother, more enjoyable, and full of hope.
+                    </p>
+                  </div>
+                </div>
+                <div class="feature text-center is-revealing">
+                  <div class="feature-inner">
+                    <div class="feature-icon">
+                      <img
+                        src="{% static 'img/icon3.png' %}"
+                        alt="Feature 03"
+                        width="120px"
+                      />
+                    </div>
+                    <h4 class="feature-title mt-24">Punctual Services</h4>
+                    <p class="text-sm mb-0">
+                      Are you tired of unpredictable transportation schedules
+                      disrupting your daily routine? We've got the solution that
+                      ensures punctuality and peace of mind. Our website
+                      provides access to precise timetables, ensuring you can
+                      plan your day with confidence.
+                    </p>
+                  </div>
+                </div>
+                <div class="feature text-center is-revealing">
+                  <div class="feature-inner">
+                    <div class="feature-icon">
+                      <img
+                        src="{% static 'img/icon4.png' %}"
+                        alt="Feature 04"
+                        width="120px"
+                        style="filter: invert(1)"
+                      />
+                    </div>
+                    <h4 class="feature-title mt-24">Secured</h4>
+                    <p class="text-sm mb-0">
+                      Your safety is our utmost priority, and we've taken every
+                      measure to ensure that your journey is not just
+                      convenient, but also incredibly secure. Your safety is
+                      enhanced from the moment you step onboard.
+                    </p>
+                  </div>
+                </div>
+                <div class="feature text-center is-revealing">
+                  <div class="feature-inner">
+                    <div class="feature-icon">
+                      <img
+                        src="{% static 'img/icon5.png' %}"
+                        alt="Feature 05"
+                        width="120px"
+                        style="filter: invert(1)"
+                      />
+                    </div>
+                    <h4 class="feature-title mt-24">College Friendly</h4>
+                    <p class="text-sm mb-0">
+                      Your busy schedule demands convenience. With our
+                      mobile-friendly website, you can book rides, track buses
+                      in real time, and receive alerts right on your smartphone.
+                      No more waiting around, choose our website and embrace the
+                      freedom, convenience, and excitement of college life to
+                      the fullest!
+                    </p>
+                  </div>
+                </div>
+                <div class="feature text-center is-revealing">
+                  <div class="feature-inner">
+                    <div class="feature-icon">
+                      <img
+                        src="{% static 'img/icon6.png' %}"
+                        alt="Feature 06"
+                        width="120px"
+                      />
+                    </div>
+                    <h4 class="feature-title mt-24">Key Locations Served</h4>
+                    <p class="text-sm mb-0">
+                      Explore your city like never before! Our extensive network
+                      connects key locations, from bustling business districts
+                      to vibrant neighborhoods, and popular landmarks. It's the
+                      golden key to unlock the hidden gems of your urban
+                      landscape.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- <section class="pricing section">
+          <div class="container-sm">
+            <div class="pricing-inner section-inner">
+              <div class="pricing-header text-center">
+                <h2 class="section-title mt-0">Unlimited for all</h2>
+                <p class="section-paragraph mb-0">
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
+                  do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                  Ut ad quis nostrud.
+                </p>
+              </div>
+              <div class="pricing-tables-wrap">
+                <div class="pricing-table">
+                  <div class="pricing-table-inner is-revealing">
+                    <div class="pricing-table-main">
+                      <div class="pricing-table-header pb-24">
+                        <div class="pricing-table-price">
+                          <span class="pricing-table-price-currency h2">$</span
+                          ><span class="pricing-table-price-amount h1">49</span
+                          ><span class="text-xs">/month</span>
+                        </div>
+                      </div>
+                      <div
+                        class="pricing-table-features-title text-xs pt-24 pb-24"
+                      >
+                        What you will get
+                      </div>
+                      <ul class="pricing-table-features list-reset text-xs">
+                        <li>
+                          <span>Lorem ipsum dolor sit nisi</span>
+                        </li>
+                        <li>
+                          <span>Lorem ipsum dolor sit nisi</span>
+                        </li>
+                        <li>
+                          <span>Lorem ipsum dolor sit nisi</span>
+                        </li>
+                        <li>
+                          <span>Lorem ipsum dolor sit nisi</span>
+                        </li>
+                      </ul>
+                    </div>
+                    <div class="pricing-table-cta mb-8">
+                      <a
+                        class="button button-primary button-shadow button-block"
+                        href="#"
+                        >Pre order now</a
+                      >
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section> -->
+
+        <section class="cta section">
+          <div class="container">
+            <div class="cta-inner section-inner">
+              <h3 class="section-title mt-0">Any Queries?</h3>
+              <div class="cta-cta">
+                <a class="button button-primary button-wide-mobile" href="#"
+                  >Get Support</a
+                >
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer class="site-footer">
+        <div class="container">
+          <div class="site-footer-inner">
+            <ul class="footer-links list-reset">
+              <!-- 
+						<li>
+							<a href="#">Contact</a>
+						</li>
+						<li>
+							<a href="#">About us</a>
+						</li>
+						<li>
+							<a href="#">FAQ's</a>
+						</li>
+            <li>
+              <a href="#">Support</a>
+            </li>
+            --></ul>
+            <div class="footer-copyright">
+              &copy;<span id="year"></span>&nbsp; Catch Your Bus, All rights
+              reserved
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <script src="{% static 'js/main.min.js' %}"></script>
+    <!-- Copyright Year -->
+    <script type="text/javascript">
+      function date() {
+        var today = new Date();
+        document.getElementById("year").innerHTML = today.getFullYear();
+      }
+    </script>
+  </body>
+</html>

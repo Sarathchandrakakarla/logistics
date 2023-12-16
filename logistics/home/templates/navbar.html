@@ -1,0 +1,45 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="{% static 'css/navbar.css' %}" />
+  <title>Document</title>
+</head>
+<style>
+  .logo-img{
+    width: 160px;
+    height: 110px;
+    background: url('{% static "img/Logo.png" %}');
+    background-size: cover;
+  }
+
+  @media screen and (max-width:900px) {
+    .logo-img{
+      width: 100px;
+      height: 70px;
+      margin-top: 10px;
+    }
+  }
+</style>
+<body>
+  <div class="header">
+  <div class="inner-width">
+    <div class="logo-img"></div>
+        <h2 class="logo"> HASTHI<!-- Catch Your Bus --></h2>
+        <i class="menu-toggle-btn fas fa-bars"></i>
+        <nav class="navigation-menu">
+          <a href="/" tabindex="0"><i class="fas fa-home home"></i> Home</a>
+          <!-- <a href="#"></i> About</a>
+          <a href="#"></i> Services</a>
+          <a href="#"></i> Skills</a> -->
+          <a href="#"></i><i class="fas fa-phone" aria-hidden="true"></i> Contact</a>
+          <a href="/auth/login_page/" class="aj_btn"> <i class="fas fa-lock" aria-hidden="true"></i>
+            LOGIN</a>
+        </nav>
+      </div>
+</div>
+<script src="{% static 'js/nav.js' %}"></script>
+</body>
+</html>
