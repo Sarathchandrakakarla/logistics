@@ -102,7 +102,6 @@
             <th>Full Name</th>
             <th>Email</th>
             <th>Mobile</th>
-            <th>DOB</th>
           </thead>
           <tbody id="passenger_list"></tbody>
         </table>
@@ -136,8 +135,10 @@
         var search_val = $("#search_inp").val().trim();
         if (document.getElementById("full_name").checked) {
           search_type = "Full_Name";
-        } else {
+        } else if (document.getElementById("username").checked) {
           search_type = "Username";
+        } else if (document.getElementById("mobile").checked) {
+          search_type = "Mobile";
         }
         if (search_val == "") {
             $("#passenger_list").empty();

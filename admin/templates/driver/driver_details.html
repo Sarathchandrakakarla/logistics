@@ -64,6 +64,16 @@
             />
             <label class="form-check-label" for="username">Username</label>
           </div>
+          <div class="form-check form-check-inline">
+            <input
+              class="form-check-input"
+              type="radio"
+              name="search_by"
+              id="mobile"
+              value="Mobile"
+            />
+            <label class="form-check-label" for="mobile">Mobile</label>
+          </div>
         </div>
       </div>
       <div class="row mt-4">
@@ -92,7 +102,6 @@
             <th>Full Name</th>
             <th>Email</th>
             <th>Mobile</th>
-            <th>DOB</th>
             <th>Available Status</th>
             <th>Bus No</th>
             <th>Current Location</th>
@@ -115,6 +124,9 @@
           case "full_name":
             $("#search_label").html("Full Name");
             break;
+          case "mobile":
+            $("#search_label").html("Mobile Number");
+            break;
         }
       });
     </script>
@@ -126,8 +138,10 @@
         var search_val = $("#search_inp").val().trim();
         if (document.getElementById("full_name").checked) {
           search_type = "Full_Name";
-        } else {
+        } else if (document.getElementById("username").checked){
           search_type = "Username";
+        } else if (document.getElementById("mobile").checked){
+          search_type = "Mobile";
         }
         if (search_val == "") {
             $("#driver_list").empty();
