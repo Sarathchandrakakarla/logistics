@@ -10,5 +10,6 @@ urlpatterns = [
     path('admin_create/',views.manage_admin),
     path('driver/create/',views.manage_driver),
     path('driver/details/',views.driver_details),
+    path('passenger/details/',views.passenger_details),
     path('requests/details/',views.request_details),
 ]
