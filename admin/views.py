@@ -189,8 +189,10 @@ def passenger_details(request):
             text = ""
             if search_type == "Username":
                 query = user.objects.filter(Username__icontains = search_value,Role='User')
-            else:
+            elif search_type == "Full_Name":
                 query = user.objects.filter(Full_Name__icontains = search_value,Role='User')
+            elif search_type == "Mobile":
+                query = user.objects.filter(Mobile__icontains = search_value,Role='User')
             for i in query:
                 pass_list.append(
                     {
@@ -198,7 +200,6 @@ def passenger_details(request):
                      "Full_Name":i.Full_Name,
                      "Mobile":i.Mobile,
                      "Email":i.Email,
-                     "DOB":i.DOB,
                     }
                 )
             i = 1
@@ -209,12 +210,6 @@ def passenger_details(request):
                 <td>'''+passenger["Full_Name"]+'''</td>
                 <td>'''+passenger["Email"]+'''</td>
                 <td>'''+passenger["Mobile"]+'''</td>
-                <td>'''
-                if passenger["DOB"] == None:
-                    text += 'N/A'
-                else:
-                    text += passenger["DOB"]
-                text += '''</td>
                 </tr>'''
                 i += 1
             return HttpResponse(text)
@@ -317,8 +312,10 @@ def driver_details(request):
             text = ""
             if search_type == "Username":
                 query = user.objects.filter(Username__icontains = search_value,Role='Driver')
-            else:
+            elif search_type == "Full_Name":
                 query = user.objects.filter(Full_Name__icontains = search_value,Role='Driver')
+            elif search_type == "Mobile":
+                query = user.objects.filter(Mobile__icontains = search_value,Role='Driver')
             for i in query:
                 driver_obj = driver.objects.filter(Username = i.Username)
                 for j in driver_obj:
@@ -328,7 +325,6 @@ def driver_details(request):
                         "Full_Name":i.Full_Name,
                         "Mobile":i.Mobile,
                         "Email":i.Email,
-                        "DOB":i.DOB,
                         "Status":j.Status,
                         "Bus_No":j.Bus_No,
                         "Current_Location":j.Current_Location,
@@ -343,7 +339,7 @@ def driver_details(request):
                     <td>'''+drivers["Full_Name"]+'''</td>
                     <td>'''+drivers["Email"]+'''</td>
                     <td>'''+drivers["Mobile"]+'''</td>'''
-                for j in ['DOB','Status','Bus_No','Current_Location']:
+                for j in ['Status','Bus_No','Current_Location']:
                     if drivers[j] == None:
                         text += '<td>N/A</td>'
                     else:
